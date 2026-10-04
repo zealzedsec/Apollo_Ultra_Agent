@@ -13,6 +13,16 @@ from kb_manager import (init_db, get_connection, get_active_project,
                         log_command, add_c2_session, add_host, add_credential,
                         add_vulnerability, add_attack_path, get_hosts)
 
+try:
+    from apollo_core.safety import preflight as _preflight
+    from apollo_core.scope import is_safe_shell_token
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - module still runs without core
+    _CORE_AVAILABLE = False
+
+    def is_safe_shell_token(_token):
+        return True
+
 EXPLOIT_CATALOG = [
     {
         "id": "ms17-010",
@@ -370,6 +380,24 @@ def attempt_exploit_rpc(opportunity, lhost=None, lport=4444, dry_run=True, timeo
     from tool_registry import msf_available
     entry = opportunity["exploit"]
     ip = opportunity["ip"]
+
+    # --- Safety gate: exploitation is intrusive -------------------------------
+    # Checked before anything else runs (even local LHOST discovery): refuse
+    # out-of-scope/unauthorized targets and targets with shell metacharacters
+    # (ip is interpolated into shell/MSF commands). A global APOLLO_DRY_RUN
+    # forces check-only mode even if the caller asked to run.
+    if not is_safe_shell_token(str(ip)):
+        return {"exploit": entry["name"], "target": ip, "success": False,
+                "dry_run": dry_run, "blocked": True,
+                "reason": "target contains unsafe shell characters"}
+    if _CORE_AVAILABLE:
+        gate = _preflight("auto_pwn_exploit", target=str(ip), intrusive=True)
+        if not gate.allowed:
+            return {"exploit": entry["name"], "target": ip, "success": False,
+                    "dry_run": dry_run, "blocked": True, "reason": gate.reason}
+        if gate.dry_run:
+            dry_run = True
+
     lhost = lhost or _get_lhost()
     result = {"exploit": entry["name"], "target": ip, "dry_run": dry_run,
               "command": "", "output": "", "success": False, "session_id": None}

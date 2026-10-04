@@ -18,6 +18,27 @@ from kb_manager import (init_db, get_connection, get_active_project,
                         add_c2_session, update_c2_session, add_c2_command,
                         get_c2_sessions, add_host, add_credential)
 
+try:
+    from apollo_core.safety import preflight as _preflight
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - module still runs without core
+    _CORE_AVAILABLE = False
+
+
+def _gate(action, target="", intrusive=True):
+    """Safety gate for an active C2 operation.
+
+    Returns ``(allowed, dry_run, reason)``. C2 actions are intrusive, so with
+    APOLLO_REQUIRE_AUTH they need an authorized engagement, and APOLLO_DRY_RUN
+    plans without executing. Listener/agent infrastructure passes an empty
+    target (there is no remote host to scope-check); the decision is audited
+    either way. Degrades to allow-all when the core is unavailable.
+    """
+    if not _CORE_AVAILABLE:
+        return True, False, "core-unavailable"
+    g = _preflight(action, target=target, intrusive=intrusive)
+    return g.allowed, g.dry_run, g.reason
+
 MSFRPCD_HOST = os.environ.get("MSFRPCD_HOST", "127.0.0.1")
 MSFRPCD_PORT = int(os.environ.get("MSFRPCD_PORT", "55552"))
 MSFRPCD_USER = os.environ.get("MSFRPCD_USER", "msf")
@@ -91,6 +112,12 @@ def deploy_agent(lhost=None, lport=None, platform="linux", arch="x64", payload_t
     """Generate and optionally deploy a C2 agent payload."""
     lhost = lhost or _get_lhost()
     lport = lport or LPORT_DEFAULT
+    allowed, dry, reason = _gate("c2_deploy_agent", "", intrusive=True)
+    if not allowed:
+        return {"blocked": True, "reason": reason, "lhost": lhost, "lport": lport}
+    if dry:
+        return {"dry_run": True, "action": "c2_deploy_agent", "platform": platform,
+                "arch": arch, "payload_type": payload_type, "lhost": lhost, "lport": lport}
     output_dir = tempfile.mkdtemp(prefix="apollo_agent_")
     output_path = os.path.join(output_dir, f"agent_{platform}_{arch}")
 
@@ -145,6 +172,12 @@ def deploy_agent(lhost=None, lport=None, platform="linux", arch="x64", payload_t
 
 def setup_listener(lhost, lport, payload="windows/x64/meterpreter/reverse_tcp"):
     """Set up a Metasploit multi/handler listener via RPC."""
+    allowed, dry, reason = _gate("c2_setup_listener", "", intrusive=True)
+    if not allowed:
+        return {"blocked": True, "reason": reason, "lhost": lhost, "lport": lport}
+    if dry:
+        return {"dry_run": True, "action": "c2_setup_listener", "lhost": lhost,
+                "lport": lport, "payload": payload}
     try:
         client = _get_msf()
         # Create a new handler console
@@ -234,6 +267,14 @@ def list_all_sessions(project_id=None):
 def run_command_on_session(session_id, command, framework="auto", timeout=60):
     """Run a command on a specific session via RPC or framework CLI."""
     result = {"session": session_id, "command": command, "framework": framework, "output": ""}
+
+    allowed, dry, reason = _gate("c2_run_command", "", intrusive=True)
+    if not allowed:
+        result.update({"blocked": True, "reason": reason})
+        return result
+    if dry:
+        result.update({"dry_run": True, "output": "(dry-run: command not executed)"})
+        return result
 
     if framework == "auto":
         if session_id.isdigit():

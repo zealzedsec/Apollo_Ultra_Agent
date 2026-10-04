@@ -19,6 +19,27 @@ from kb_manager import (init_db, get_connection, get_active_project,
                         get_project_id, create_event, log_command,
                         add_credential, add_host, get_hosts, get_credentials)
 
+try:
+    from apollo_core.safety import preflight as _preflight
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - module still runs without core
+    _CORE_AVAILABLE = False
+
+
+def _gate(action, target="", intrusive=True):
+    """Safety gate for an active credential operation.
+
+    Returns ``(allowed, dry_run, reason)``. Cracking/spraying/PtH are intrusive
+    by default, so with APOLLO_REQUIRE_AUTH set they need an authorized
+    engagement, with APOLLO_ENFORCE_SCOPE a target must be in scope, and
+    APOLLO_DRY_RUN plans without executing. Degrades to allow-all if the core is
+    unavailable, preserving prior behavior.
+    """
+    if not _CORE_AVAILABLE:
+        return True, False, "core-unavailable"
+    g = _preflight(action, target=target, intrusive=intrusive)
+    return g.allowed, g.dry_run, g.reason
+
 # Hashcat mode mapping for auto-detection
 HASHCAT_MODES = [
     (r"^[a-f0-9]{32}$", 0, "MD5"),
@@ -275,6 +296,12 @@ def execute_crack(hash_str, wordlist="rockyou", rules="best64", timeout=600):
     info = detect_hash_type(hash_str)
     if info["mode"] is None:
         return {"error": "Unknown hash type", "hash": hash_str[:40]}
+    allowed, dry, reason = _gate("cred_crack", "", intrusive=True)
+    if not allowed:
+        return {"blocked": True, "reason": reason, "hash": hash_str[:40]}
+    if dry:
+        return {"dry_run": True, "action": "cred_crack", "hash": hash_str[:40],
+                "hash_type": info["name"]}
     wl = SPRAY_WORDLISTS.get(wordlist, wordlist)
     rule_path = f"/usr/share/hashcat/rules/{rules}.rule"
     hash_file = tempfile.mktemp(suffix=".hash")
@@ -337,6 +364,15 @@ def execute_spray(project_id, target_ip=None, service="smb", timeout=120):
     if not pairs:
         return {"error": "No valid credential pairs", "results": []}
     for ip in targets:
+        allowed, dry, reason = _gate("cred_spray", ip, intrusive=True)
+        if not allowed:
+            results.append({"ip": ip, "service": service, "success": False,
+                            "blocked": True, "reason": reason})
+            continue
+        if dry:
+            results.append({"ip": ip, "service": service, "success": False,
+                            "dry_run": True})
+            continue
         for u, p in pairs:
             safe_u = shlex.quote(u)
             safe_p = shlex.quote(p)
@@ -377,6 +413,15 @@ def execute_pth(project_id, target_ip=None, timeout=120):
             user = c.get("username", "")
             targets = [target_ip] if target_ip else [h["ip"] for h in hosts]
             for ip in targets:
+                allowed, dry, reason = _gate("cred_pth", ip, intrusive=True)
+                if not allowed:
+                    results.append({"ip": ip, "username": user, "ntlm_present": True,
+                                    "success": False, "blocked": True, "reason": reason})
+                    continue
+                if dry:
+                    results.append({"ip": ip, "username": user, "ntlm_present": True,
+                                    "success": False, "dry_run": True})
+                    continue
                 safe_u = shlex.quote(user)
                 if spray_bin:
                     out = _run_cmd(f"{spray_bin} smb {ip} -u {safe_u} -H '{ntlm}' --continue-on-success 2>&1", timeout)
