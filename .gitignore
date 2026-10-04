@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+
+# Secrets / local environment (never commit - see SECURITY.md)
+.env
+*.key
+
+# Apollo local state and engagement artifacts (never commit)
+apollo.db
+apollo.db-wal
+apollo.db-shm
+*.sqlite
+apollo.config.json
+engagement.json
+scope.txt
+audit.log.jsonl
+.active_project
+.nvd_cache.json
+apollo-engine/apollo.db
+apollo-engine/projects/
+apollo-engine/reports/
+apollo-engine/cache/
+reports/
+cache/
+projects/
+
+# Node
+node_modules/

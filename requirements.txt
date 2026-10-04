@@ -1,0 +1,13 @@
+# Apollo Ultra runtime dependencies.
+# The framework targets Python 3.9+ and uses the standard library wherever
+# possible (urllib for HTTP, sqlite3 for the KB, argparse for CLIs).
+
+# Required: credential vault encryption (Fernet / PBKDF2) in kb_manager.py.
+cryptography>=3.4
+
+# Optional: PDF report rendering in report_generator.py. Markdown reports work
+# without it. Install with:  pip install -r requirements.txt fpdf2
+# fpdf2>=2.7
+
+# Development / testing extras are declared in pyproject.toml:
+#   pip install -e .[dev]

@@ -1,93 +1,79 @@
 #!/usr/bin/env python3
 """
-APOLLO Scope Validator - Validate targets against scope file.
-Supports CIDR ranges, IP ranges, hostnames, and domain patterns.
+APOLLO Scope Validator - Validate targets against a scope file.
+
+As of v4.1 the matching logic lives in :mod:`apollo_core.scope`, which fixes
+several correctness bugs in the original matcher (unanchored IP regex, missing
+octet validation, and wildcard suffix collisions such as ``notexample.com``
+matching ``*.example.com``) and adds IPv6, CIDR, ranges, deny rules, and URL
+normalization. This module keeps its original CLI and function contract so
+existing callers and the ``opencode.jsonc`` hook keep working unchanged.
+
+Usage:
+    scope_validator.py <command> <scope_file>
 """
-import sys
 import os
-import ipaddress
-import re
+import sys
 
-def load_scope(scope_file):
-    if not scope_file or not os.path.exists(scope_file):
-        return []
-    entries = []
-    with open(scope_file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                entries.append(line)
-    return entries
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-def target_in_scope(target, scope_entries):
-    target = target.strip()
-    for entry in scope_entries:
-        entry = entry.strip()
-        try:
-            if '/' in entry:
-                network = ipaddress.ip_network(entry, strict=False)
-                try:
-                    ip = ipaddress.ip_address(target)
-                    if ip in network:
-                        return True, f"{target} in {entry}"
-                except ValueError:
-                    continue
-            elif '-' in entry:
-                parts = entry.split('-')
-                if len(parts) == 2:
-                    start = ipaddress.ip_address(parts[0].strip())
-                    end = ipaddress.ip_address(parts[1].strip())
+try:
+    from apollo_core.scope import load_scope, target_in_scope, check_command
+except Exception:  # pragma: no cover - standalone fallback if core is unavailable
+    import ipaddress
+
+    def load_scope(scope_file):
+        if not scope_file or not os.path.exists(scope_file):
+            return []
+        entries = []
+        with open(scope_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    entries.append(line)
+        return entries
+
+    def target_in_scope(target, scope_entries):
+        target = (target or "").strip()
+        for entry in scope_entries:
+            entry = entry.strip()
+            try:
+                if "/" in entry:
+                    net = ipaddress.ip_network(entry, strict=False)
                     try:
-                        ip = ipaddress.ip_address(target)
-                        if start <= ip <= end:
-                            return True, f"{target} in range {entry}"
+                        if ipaddress.ip_address(target) in net:
+                            return True, f"{target} in {entry}"
                     except ValueError:
                         continue
-            else:
-                if target == entry:
-                    return True, f"{target} matches {entry}"
-                if entry.startswith('*.'):
-                    domain = entry[2:]
-                    if target.endswith(domain):
+                elif entry.startswith("*."):
+                    dom = entry[2:].lower()
+                    tl = target.lower()
+                    if tl == dom or tl.endswith("." + dom):
                         return True, f"{target} matches wildcard {entry}"
-                try:
-                    ip = ipaddress.ip_address(target)
-                    single = ipaddress.ip_address(entry)
-                    if ip == single:
-                        return True, f"{target} matches {entry}"
-                except ValueError:
-                    if target.lower() == entry.lower():
-                        return True, f"{target} matches {entry}"
-        except ValueError:
-            continue
-    return False, f"{target} NOT in scope"
+                elif target.lower() == entry.lower():
+                    return True, f"{target} matches {entry}"
+            except ValueError:
+                continue
+        return False, f"{target} NOT in scope"
 
-def check_command(command, scope_file):
-    scope_entries = load_scope(scope_file)
-    if not scope_entries:
-        return "OK", "No scope file defined - all targets allowed"
-    
-    words = command.split()
-    targets_found = []
-    ip_pattern = re.compile(r'\b(?:\d{1,3}\.){3}\d{1,3}\b')
-    domain_pattern = re.compile(r'\b[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}\b')
-    
-    for word in words:
-        if ip_pattern.match(word):
-            targets_found.append(word)
-        elif domain_pattern.match(word) and '.' in word and not word.startswith('/'):
-            targets_found.append(word)
-    
-    for target in targets_found:
-        in_scope, msg = target_in_scope(target, scope_entries)
-        if not in_scope:
-            return "VIOLATION", msg
-    
-    return "OK", f"All targets in scope"
+    def check_command(command, scope_file):
+        entries = load_scope(scope_file)
+        if not entries:
+            return "OK", "No scope file defined - all targets allowed"
+        import re
+
+        ip_re = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+        for word in command.split():
+            if ip_re.match(word) or ("." in word and not word.startswith("/")):
+                ok, msg = target_in_scope(word, entries)
+                if not ok:
+                    return "VIOLATION", msg
+        return "OK", "All targets in scope"
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        command = ' '.join(sys.argv[1:-1]) if len(sys.argv) > 2 else sys.argv[1]
+        command = " ".join(sys.argv[1:-1]) if len(sys.argv) > 2 else sys.argv[1]
         scope_file = sys.argv[-1] if len(sys.argv) > 2 else ""
         status, msg = check_command(command, scope_file)
         print(f"{status}: {msg}")

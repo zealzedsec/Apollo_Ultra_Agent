@@ -9,7 +9,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kb_manager import *
 from findings_parser import smart_parse
 
+try:
+    from apollo_core.models import normalize_severity, risk_score, Finding
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - correlator still runs without core
+    _CORE_AVAILABLE = False
+
 SEVERITY_WEIGHTS = {"critical": 10, "high": 7, "medium": 4, "low": 1, "info": 0}
+
+
+def _sev_weight(severity):
+    """Weight a severity string, tolerating any tool's spelling/casing."""
+    if _CORE_AVAILABLE:
+        return normalize_severity(severity).weight
+    return SEVERITY_WEIGHTS.get(str(severity or "info").lower(), 0)
 
 def auto_triage(project_id):
     """Analyze KB data, compute per-host priority scores, suggest next actions."""
@@ -37,7 +50,7 @@ def auto_triage(project_id):
             host_sessions = [s for s in sessions if s.get("ip") == ip]
             host_ports = [p for p in ports_all if p.get("ip") == ip]
 
-            vuln_score = sum(SEVERITY_WEIGHTS.get(v.get("severity", "info").lower(), 0) for v in host_vulns)
+            vuln_score = sum(_sev_weight(v.get("severity", "info")) for v in host_vulns)
             cred_score = len(host_creds) * 3
             session_score = len(host_sessions) * 5
             port_score = len(host_ports)
@@ -51,7 +64,7 @@ def auto_triage(project_id):
 
             suggestions = []
             if host_vulns:
-                top_vuln = max(host_vulns, key=lambda v: SEVERITY_WEIGHTS.get(v.get("severity", "info").lower(), 0))
+                top_vuln = max(host_vulns, key=lambda v: _sev_weight(v.get("severity", "info")))
                 if top_vuln.get("cve_id"):
                     suggestions.append(f"Try auto_pwn against {ip} ({top_vuln['name']})")
             if host_creds and not host_sessions:
@@ -103,6 +116,13 @@ def auto_triage(project_id):
 
         high_priority = [h for h in host_analysis if h["priority_label"] in ("critical", "high")]
 
+        # Normalized, severity-weighted 0-100 risk score across all findings.
+        risk = (
+            risk_score(vulns_all)
+            if _CORE_AVAILABLE
+            else {"score": None, "label": "n/a", "total": len(vulns_all), "counts": {}}
+        )
+
         return {
             "generated": datetime.now().isoformat(),
             "total_hosts": len(hosts),
@@ -111,6 +131,7 @@ def auto_triage(project_id):
             "active_sessions": len(sessions),
             "attack_paths": len(paths),
             "compromised_pct": round(pct_owned, 1),
+            "risk": risk,
             "global_suggestions": global_suggestions,
             "high_priority_targets": high_priority[:5],
             "all_hosts": host_analysis
@@ -137,17 +158,26 @@ def correlate(project_id, nmap_files=None, nuclei_files=None):
                             url = f"{proto}://{host['ip']}:{p['port']}"
                             add_vulnerability(hid, f"Web service exposed: {url}", "info", description=f"Web service on port {p['port']}")
         if nuclei_files:
+            seen = set()
             for f in nuclei_files.split(','):
                 f = f.strip()
                 parsed = smart_parse(f, "nuclei")
                 for v in parsed.get("results", []):
                     ip = re.search(r'[\d.]+', v.get("host", ""))
                     ip_val = ip.group(0) if ip else v.get("host", "")
-                    if ip_val:
-                        hid = add_host(project_id, ip_val)
-                        add_vulnerability(hid, v.get("name", "Unknown"),
-                                          v.get("severity", "medium"),
-                                          evidence=str(v.get("extracted", [])))
+                    if not ip_val:
+                        continue
+                    # De-duplicate identical findings across multiple input files.
+                    if _CORE_AVAILABLE:
+                        key = Finding(name=v.get("name", "Unknown"), host=ip_val,
+                                      severity=v.get("severity", "medium")).dedup_key()
+                        if key in seen:
+                            continue
+                        seen.add(key)
+                    hid = add_host(project_id, ip_val)
+                    add_vulnerability(hid, v.get("name", "Unknown"),
+                                      v.get("severity", "medium"),
+                                      evidence=str(v.get("extracted", [])))
 
         triage = auto_triage(project_id)
         create_event(project_id, "correlation", "correlator",

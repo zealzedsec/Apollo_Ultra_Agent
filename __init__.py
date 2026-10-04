@@ -1,6 +1,7 @@
-# APOLLO ULTRA v4 - 34 Engine Modules
-__version__ = "4.0.1"
+# APOLLO ULTRA v4.1 - 34 Engine Modules + apollo_core safety foundation
+__version__ = "4.1.0"
 __all__ = [
+    "apollo_core",
     "kb_manager", "mcp_server", "findings_parser", "correlator",
     "planner", "report_generator", "orchestrator", "kali_tools",
     "scope_validator", "session_manager", "nvd_enricher",

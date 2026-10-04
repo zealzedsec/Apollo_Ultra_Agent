@@ -15,7 +15,26 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kb_manager import *
 from report_generator import generate_report
 
+try:
+    from apollo_core.safety import preflight
+    from apollo_core.scope import is_safe_shell_token
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - orchestrator still runs without core
+    _CORE_AVAILABLE = False
+
+    def is_safe_shell_token(_token):
+        return True
+
 STEP_TIMEOUT = 120
+
+# Steps that actively exploit, spray, or otherwise change the target state.
+# These require intrusive authorization from the engagement context when
+# APOLLO_REQUIRE_AUTH is set.
+INTRUSIVE_TOOLS = {
+    "autopwn-live", "autopwn-check", "exploit-sync", "sqlmap", "responder",
+    "GetNPUsers", "GetUserSPNs", "cred-crack", "cred-exec-crack",
+    "cred-exec-spray", "cred-exec-pth", "container-escape", "wpscan",
+}
 
 WORKFLOWS = {
     "full-kill-chain": {
@@ -170,6 +189,32 @@ def _tool_available(name):
 def execute_step(tool, target, pid, context=None):
     """Execute a workflow step with real tool detection and fallbacks. Returns result dict."""
     context = context or {}
+
+    # --- Safety gate: scope + engagement authorization + audit + dry-run ---
+    # Every step passes through here before any command is built or run. A
+    # target with shell metacharacters is refused outright (it would be
+    # interpolated unquoted into the command string), an out-of-scope or
+    # unauthorized target is blocked, and APOLLO_DRY_RUN turns the step into a
+    # no-op plan. All outcomes are written to the tamper-evident audit log.
+    if target and not is_safe_shell_token(target):
+        msg = f"BLOCKED: target {target!r} contains unsafe shell characters"
+        log_command(pid, f"workflow_step:{tool}", "orchestrator", target, msg, 126)
+        return {"tool": tool, "exit_code": 126, "output_summary": msg,
+                "success": False, "blocked": True, "context": context}
+    if _CORE_AVAILABLE:
+        gate = preflight(f"workflow_step:{tool}", target=target,
+                         intrusive=(tool in INTRUSIVE_TOOLS))
+        if not gate.allowed:
+            msg = f"BLOCKED by safety gate: {gate.reason}"
+            log_command(pid, f"workflow_step:{tool}", "orchestrator", target, msg, 126)
+            return {"tool": tool, "exit_code": 126, "output_summary": msg,
+                    "success": False, "blocked": True, "context": context}
+        if gate.dry_run:
+            msg = f"DRY-RUN: would execute {tool} against {target} (not run)"
+            log_command(pid, f"workflow_step:{tool}", "orchestrator", target, msg, 0)
+            return {"tool": tool, "exit_code": 0, "output_summary": msg,
+                    "success": True, "dry_run": True, "context": context}
+
     log_command(pid, f"workflow_step:{tool}", "orchestrator", target, f"Executing {tool}", 0)
     ed = _get_engine_dir()
     py = _get_python()
