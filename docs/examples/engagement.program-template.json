@@ -1,0 +1,18 @@
+{
+  "engagement_id": "PROGRAM-TEMPLATE (rename me)",
+  "operator": "set-me",
+  "client": "Program name (e.g. GitHub / Intigriti / Shopify)",
+  "authorized": false,
+  "scope_allow": [
+    "REPLACE-with-exact-in-scope-assets-from-the-live-brief.example.com",
+    "*.in-scope-wildcard.example.com"
+  ],
+  "scope_deny": [
+    "*.out-of-scope.example.com",
+    "third-party-you-must-not-touch.example.net"
+  ],
+  "window_start": "2026-10-04T00:00:00Z",
+  "window_end": "2026-12-31T23:59:59Z",
+  "intrusive_allowed": false,
+  "notes": "TEMPLATE for a real public program. Before use: (1) register on the platform and READ the current brief end-to-end; (2) copy the EXACT in-scope assets into scope_allow and every out-of-scope/third-party asset into scope_deny; (3) set authorized=true ONLY after you have accepted the program's terms (that acceptance is your authorization and your limit); (4) keep intrusive_allowed=FALSE - do not enable exploitation/spraying/C2 against production; (5) honor the program's rate limit and any required identifying header (e.g. Intigriti: <=10 req/s + X-Intigriti-Username header; GitHub: no excessive traffic). Most programs forbid or heavily restrict automated scanning on production - when in doubt, test manually and use a sanctioned range for tooling. Run with APOLLO_ENFORCE_SCOPE=1 and start in APOLLO_DRY_RUN=1."
+}

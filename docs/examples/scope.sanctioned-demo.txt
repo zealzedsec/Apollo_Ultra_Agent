@@ -1,0 +1,23 @@
+# Apollo scope file - SANCTIONED TEST RANGES ONLY
+# These hosts' owners explicitly authorize security-tool testing. Verify the
+# current terms at the cited URLs before each run; authorizations can change.
+#
+# Lines with no prefix are ALLOW rules. Lines starting with ! are DENY rules
+# (deny always wins). See apollo_core/scope.py.
+
+# scanme.nmap.org - Nmap Project authorizes *scanning only* of this one host
+#   (<= ~12 scans/day, no exploitation, no DoS).
+#   https://nmap.org/book/man-examples.html
+scanme.nmap.org
+
+# testphp.vulnweb.com - Acunetix/Invicti intentionally-vulnerable site provided
+#   specifically to exercise web vulnerability scanners.
+#   http://testphp.vulnweb.com/
+testphp.vulnweb.com
+
+# Belt-and-suspenders explicit denies (the allow-list already excludes anything
+# not listed above; these just make common foot-guns impossible).
+!example.com
+!*.google.com
+!169.254.0.0/16
+!127.0.0.0/8

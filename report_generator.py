@@ -7,6 +7,19 @@ from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kb_manager import *
 
+try:
+    from apollo_core.models import normalize_severity as _norm_sev
+    _CORE_AVAILABLE = True
+except Exception:  # pragma: no cover - report still renders without core
+    _CORE_AVAILABLE = False
+
+
+def _sev_key(sev):
+    """Canonical severity key tolerant of any tool's spelling/casing."""
+    if _CORE_AVAILABLE:
+        return _norm_sev(sev).value
+    return str(sev or "low").lower()
+
 MITRE_MAPPING = {
     "recon": {"T1595": "Active Scanning", "T1592": "Gather Victim Host Information", "T1589": "Gather Victim Identity Information", "T1590": "Gather Victim Network Information"},
     "scan": {"T1046": "Network Service Discovery", "T1040": "Network Sniffing"},
@@ -24,7 +37,7 @@ def _compute_risk_score(vulns):
     if not vulns:
         return 0, "None"
     weights = {"critical": 10, "high": 7, "medium": 4, "low": 1, "info": 0}
-    total = sum(weights.get(v.get("severity", "low").lower(), 0) for v in vulns)
+    total = sum(weights.get(_sev_key(v.get("severity", "low")), 0) for v in vulns)
     max_possible = len(vulns) * 10
     pct = (total / max_possible * 100) if max_possible else 0
     if pct >= 30: return round(pct, 1), "Critical"
