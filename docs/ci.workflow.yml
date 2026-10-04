@@ -1,0 +1,68 @@
+# Apollo Ultra CI workflow (template).
+# Copy this file to .github/workflows/ci.yml to enable it; GitHub only runs
+# workflows from that path, and pushing there needs a token with the
+# `workflow` scope:
+#   mkdir -p .github/workflows && cp docs/ci.workflow.yml .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint new code (ruff)
+        run: ruff check apollo_core tests
+
+      - name: Byte-compile every module
+        run: python -m compileall -q apollo_core tests *.py
+
+      - name: Run tests
+        run: pytest
+
+      - name: Core self-test
+        run: apollo selftest
+
+  secret-scan:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for committed secrets / local paths
+        shell: bash
+        run: |
+          # Mirrors the check in SECURITY.md. Fails the build if anything that
+          # looks like a key, token, password, or absolute home path is found.
+          pattern='sk-[A-Za-z0-9]{20,}|api[_-]?key=.*[A-Za-z0-9]{16,}|token=.*[A-Za-z0-9]{16,}|password=.*[A-Za-z0-9]{8,}|/home/[A-Za-z0-9_-]+'
+          if grep -RInE "$pattern" . \
+               --exclude-dir=.git \
+               --exclude-dir=.github \
+               --exclude='*.lock' \
+               --exclude='package-lock.json'; then
+            echo "::error::Potential secret or local path committed (see matches above)."
+            exit 1
+          fi
+          echo "No secrets detected."

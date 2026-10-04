@@ -49,6 +49,16 @@ pip install -e ".[dev]"
 pytest
 ```
 
+Continuous integration (ruff + compile + pytest on py3.9/3.12 + a secret scan)
+is provided as a ready-to-use workflow at
+[`docs/ci.workflow.yml`](docs/ci.workflow.yml). Enable it by copying it into
+place (requires a token with the `workflow` scope):
+
+```bash
+mkdir -p .github/workflows && cp docs/ci.workflow.yml .github/workflows/ci.yml
+git add .github/workflows/ci.yml && git commit -m "Enable CI" && git push
+```
+
 ## What Is Included
 
 - `opencode.jsonc` - OpenCode agent, command, instruction, skill, and MCP configuration.
