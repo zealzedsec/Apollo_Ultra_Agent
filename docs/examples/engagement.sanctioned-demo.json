@@ -1,0 +1,18 @@
+{
+  "engagement_id": "APOLLO-SANCTIONED-DEMO",
+  "operator": "set-me (APOLLO_OPERATOR or your handle)",
+  "client": "Self / owner-authorized public test ranges",
+  "authorized": true,
+  "scope_allow": [
+    "scanme.nmap.org",
+    "testphp.vulnweb.com"
+  ],
+  "scope_deny": [
+    "example.com",
+    "*.google.com",
+    "169.254.0.0/16",
+    "127.0.0.0/8"
+  ],
+  "intrusive_allowed": false,
+  "notes": "Recon/scan DEMO only, against ranges whose owners explicitly authorize tool testing. scanme.nmap.org: Nmap scanning only, <=12 scans/day, no exploit, no DoS (https://nmap.org/book/man-examples.html). testphp.vulnweb.com: Acunetix intentionally-vulnerable web-scanner test site (http://testphp.vulnweb.com/). intrusive_allowed is FALSE: exploitation, credential spraying, and C2 are refused by the safety gate. This is NOT a production third party. Re-read each owner's current terms before every run."
+}
