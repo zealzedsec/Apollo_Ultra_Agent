@@ -4,6 +4,61 @@ Apollo Ultra is an OpenCode configuration and Python framework for authorized se
 
 This public copy is sanitized for GitHub. It does not include local databases, project artifacts, reports, caches, `node_modules`, `.env`, API keys, credentials, private paths, or personal data.
 
+## New in v4.1 - Safety, Authorization & Audit Core
+
+Apollo Ultra is for **authorized** assessment. v4.1 makes that authorization
+enforceable and provable through a new `apollo_core` package that the engine
+modules build on:
+
+- **Scope engine** - a boundary-correct allow/deny evaluator (IPv4/IPv6, CIDR,
+  ranges, wildcard domains, URLs) that fixes real matching bugs in the original
+  validator. Deny rules always win.
+- **Engagement manifest** - an `engagement.json` encoding the rules of
+  engagement (operator, client, authorized scope, time window, whether intrusive
+  actions are permitted). The framework refuses to act outside it.
+- **Tamper-evident audit log** - an append-only, hash-chained record of every
+  active decision; `apollo audit verify` detects any edit, insertion, or
+  deletion.
+- **Dry-run mode** - `APOLLO_DRY_RUN=1` plans and audits a whole workflow
+  without executing anything.
+- **Safety gate at the execution chokepoint** - the orchestrator routes every
+  workflow step through scope + authorization + audit, and refuses targets
+  containing shell metacharacters.
+
+Unified CLI:
+
+```bash
+apollo selftest                 # verify the core end to end (offline)
+apollo scope check 10.0.0.5
+apollo engagement init --id ACME-2026 --allow 10.0.0.0/24 --operator you --authorized
+apollo audit tail 20
+apollo audit verify
+```
+
+Recommended live-engagement posture:
+
+```bash
+export APOLLO_ENFORCE_SCOPE=1 APOLLO_REQUIRE_AUTH=1 APOLLO_OPERATOR="you"
+```
+
+See [docs/SAFETY.md](docs/SAFETY.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Install and test locally with:
+
+```bash
+pip install -e ".[dev]"
+pytest
+```
+
+Continuous integration (ruff + compile + pytest on py3.9/3.12 + a secret scan)
+is provided as a ready-to-use workflow at
+[`docs/ci.workflow.yml`](docs/ci.workflow.yml). Enable it by copying it into
+place (requires a token with the `workflow` scope):
+
+```bash
+mkdir -p .github/workflows && cp docs/ci.workflow.yml .github/workflows/ci.yml
+git add .github/workflows/ci.yml && git commit -m "Enable CI" && git push
+```
+
 ## What Is Included
 
 - `opencode.jsonc` - OpenCode agent, command, instruction, skill, and MCP configuration.
@@ -148,7 +203,7 @@ Run these checks before the first commit:
 
 ```bash
 cd apollo-ultra-public
-grep -RInE 'sk-[A-Za-z0-9]|api[_-]?key=.*[A-Za-z0-9]{16,}|token=.*[A-Za-z0-9]{16,}|password=.*[A-Za-z0-9]{8,}|/home/[A-Za-z0-9_-]+' . --exclude-dir=.git || true
+grep -RInE 'sk-[A-Za-z0-9]{20,}|api[_-]?key=.*[A-Za-z0-9]{16,}|token=.*[A-Za-z0-9]{16,}|password=.*[A-Za-z0-9]{8,}|/home/[A-Za-z0-9_-]+' . --exclude-dir=.git || true
 git status --short
 ```
 

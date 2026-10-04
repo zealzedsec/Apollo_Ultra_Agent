@@ -119,8 +119,13 @@ The knowledge base is SQLite-backed at ~/.config/opencode/apollo-engine/apollo.d
 - `report_generator.py` - Professional pentest report (markdown)
 - `orchestrator.py` - 12 workflow automations with real tool execution
 - `kali_tools.py` - Tool availability audit (13 categories, 150+ tools)
-- `scope_validator.py` - Target scope validation
+- `scope_validator.py` - Target scope validation (delegates to `apollo_core.scope`)
 - `session_manager.py` - C2 session tracking
+- `apollo_core/` - Safety, authorization & audit foundation (v4.1). Enforces
+  engagement scope and rules of engagement, records a tamper-evident audit
+  trail, and supports dry-run. Set `APOLLO_ENFORCE_SCOPE=1` and
+  `APOLLO_REQUIRE_AUTH=1` for live engagements; use the `apollo` CLI
+  (`apollo selftest|scope|engagement|audit`). See `docs/SAFETY.md`.
 
 ### Intelligence Modules (8)
 - `nvd_enricher.py` - NVD CVE API integration, auto-CVSS enrichment
