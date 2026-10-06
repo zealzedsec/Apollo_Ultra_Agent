@@ -1,0 +1,48 @@
+== TELL SCAN: /home/user/apollo_ultra_agent ==
+-- typography
+saturated-fonts              2
+    /home/user/apollo_ultra_agent/phishing_engine.py:44:<style>body{font-family:Roboto,Arial,sans-serif;background:#fff;display:flex;justify-content:center;padding-top:120px}
+    /home/user/apollo_ultra_agent/orchestrator.py:6:  - Inter-step data passing (context dict flows through pipeline)
+caps-tracked-labels          0
+-- color
+default-purple-family        0
+gradient-text                0
+gradient-washes              0
+known-default-hex            0
+-- layout/components
+glass-blur                   0
+uniform-radius-shadow        0
+default-button-card-names    0
+pill-badge-new               0
+-- icons/imagery
+default-icon-sets            0
+emoji-as-ui                  10
+    /home/user/apollo_ultra_agent/apollo_core/logging.py:170:        missing sequence numbers — i.e. any insertion, deletion, or edit.
+    /home/user/apollo_ultra_agent/tests/test_module_gating.py:4:touches the network, a real tool, or the database — they assert only that the
+    /home/user/apollo_ultra_agent/docs/SAFETY.md:11:   they *withhold* capability — the core never grants an action the operator
+stock-or-placeholder-img     0
+-- motion
+generic-motion               0
+-- copy
+cliche-copy                  2
+    /home/user/apollo_ultra_agent/kali_tools.py:76:        ("enum4linux-ng", "enum4linux-ng", "enum4linux-ng", "SMB enumeration next-gen", ""),
+    /home/user/apollo_ultra_agent/subfinder_wrapper.py:22:        "To get started with CloudFront", "BadRequest",
+placeholder-names            8
+    /home/user/apollo_ultra_agent/apollo_core/cli.py:14:    apollo engagement init --id ACME-2026 --allow 10.0.0.0/24 --operator jane
+    /home/user/apollo_ultra_agent/apollo_core/authorization.py:14:      "engagement_id": "ACME-2026-Q1",
+    /home/user/apollo_ultra_agent/apollo_core/authorization.py:16:      "client": "ACME Corp",
+vague-errors                 0
+-- backend
+boilerplate-startup-log      0
+emoji-in-logs                0
+weak-error-shape             0
+http200-with-failure         22
+    /home/user/apollo_ultra_agent/pivot_planner.py:112:        return {"pivot_ip": pivot_ip, "success": False, "output": "TIMEOUT"}
+    /home/user/apollo_ultra_agent/pivot_planner.py:114:        return {"pivot_ip": pivot_ip, "success": False, "output": str(e)}
+    /home/user/apollo_ultra_agent/wireless_auditor.py:162:    return {"success": False, "output": result.stdout[:500]}
+wildcard-cors                0
+todo-implement               1
+    /home/user/apollo_ultra_agent/apollo_core/models.py:42:            return NotImplemented
+verb-style-routes            0
+-- structure (filename checks)
+== END ==
